@@ -1,0 +1,7 @@
+[package]
+name = "reed_solomon_demo"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+reed_solomon_rs = "0.1.2"
