@@ -1,0 +1,13 @@
+[package]
+name = "backend"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+axum = {version = "0.8.1", features = ["multipart"] }             # Web framework for Rust
+axum-server = "0.7.1"
+tokio = { version = "1", features = ["full"] }  # Async runtime
+tower = "0.5.2"             # Middleware and utilities
+reed_solomon_rs = "0.1.2"   # Your existing Reed-Solomon library
+zip = "2.2.2"               # For creating zip files
+
