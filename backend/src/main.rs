@@ -30,7 +30,8 @@ async fn main() {
     let app = Router::new()
         .route("/", get(|| async { "Reed-Solomon Encoding Service" }))
         .route("/encode", post(encode_file))
-        .route("/decode", post(decode_files));
+        .route("/decode", post(decode_files))
+        .layer(cors);
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 8000));
     println!("Server running on {}", addr);
@@ -42,9 +43,12 @@ async fn main() {
 
 // Handler for encoding files
 async fn encode_file(mut multipart: Multipart) -> impl IntoResponse {
+    println!("Encoding file");
     let required = 4;
     let total = 8;
     let fec = FEC::new(required, total).unwrap();
+
+    println!("Reading file data");
 
     let mut file_data = vec![];
 
@@ -52,6 +56,8 @@ async fn encode_file(mut multipart: Multipart) -> impl IntoResponse {
     while let Some(field) = multipart.next_field().await.unwrap() {
         file_data.extend_from_slice(&field.bytes().await.unwrap());
     }
+
+    println!("Encoding file data");
 
     let mut shares: Vec<Share> = vec![
         Share {
@@ -65,6 +71,8 @@ async fn encode_file(mut multipart: Multipart) -> impl IntoResponse {
     };
 
     fec.encode(&file_data, output).unwrap();
+
+    println!("Creating ZIP archive");
 
     // Create a ZIP archive in memory
     let mut buf = Cursor::new(Vec::new());
@@ -81,6 +89,7 @@ async fn encode_file(mut multipart: Multipart) -> impl IntoResponse {
         zip.finish().unwrap();
     }
 
+    println!("Returning ZIP archive");
     // Return the ZIP file
     (
         StatusCode::OK,
