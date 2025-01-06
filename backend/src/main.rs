@@ -17,16 +17,22 @@ use std::{
 };
 use tokio::sync::Mutex;
 use tower::ServiceBuilder;
+use tower_http::cors::{Any, CorsLayer};
 use zip::write::SimpleFileOptions;
 
 #[tokio::main]
 async fn main() {
+    // In your app setup:
+    let cors = CorsLayer::new()
+        .allow_methods(Any)
+        .allow_headers(Any)
+        .allow_origin(Any);
     let app = Router::new()
         .route("/", get(|| async { "Reed-Solomon Encoding Service" }))
         .route("/encode", post(encode_file))
         .route("/decode", post(decode_files));
 
-    let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
+    let addr = SocketAddr::from(([127, 0, 0, 1], 8000));
     println!("Server running on {}", addr);
     Server::bind(addr)
         .serve(app.into_make_service())
