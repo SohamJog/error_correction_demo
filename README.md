@@ -1,5 +1,3 @@
-idk why 50% of the codeabse is makefile. 
-
 # Reed-Solomon Error Correction Project
 
 This project is a demo of the [Reed Solomon Error correction library](https://github.com/sohamjog/reed_solomon_rs) written in Rust. 
