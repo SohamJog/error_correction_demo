@@ -5,6 +5,9 @@ const FileProcessor = () => {
   const [encodeStatus, setEncodeStatus] = useState('');
   const [decodeStatus, setDecodeStatus] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedDecodeFiles, setSelectedDecodeFiles] = useState([]); 
+  const [selectedEncodeFiles, setSelectedEncodeFiles] = useState([]); 
+
 
   const handleEncode = async (e) => {
     e.preventDefault();
@@ -13,7 +16,7 @@ const FileProcessor = () => {
 
     const formData = new FormData();
     const file = e.target.file.files[0];
-    
+
     if (!file) {
       setEncodeStatus('Please select a file');
       setIsLoading(false);
@@ -87,25 +90,29 @@ const FileProcessor = () => {
     setIsLoading(false);
   };
 
+  const handleFileSelectionDecode = (e) => {
+    const files = Array.from(e.target.files);
+    setSelectedDecodeFiles(files.map((file) => file.name)); // Store selected file names
+  };
+  const handleFileSelectionEncode = (e) => {
+    const files = Array.from(e.target.files);
+    setSelectedEncodeFiles(files.map((file) => file.name)); // Store selected file names
+  };
+
   const StatusAlert = ({ status, type }) => {
     if (!status) return null;
-    
-    const bgColor = status === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
-    const message = status === 'success' 
-      ? `File ${type} successfully!` 
-      : `Failed to ${type} file`;
 
-    return (
-      <div className={`${bgColor} p-4 rounded-lg mt-4`}>
-        {message}
-      </div>
-    );
+    const bgColor = status === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+    const message =
+      status === 'success' ? `File ${type} successfully!` : `Failed to ${type} file`;
+
+    return <div className={`${bgColor} p-4 rounded-lg mt-4`}>{message}</div>;
   };
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-8">
-      <h1 className="text-3xl font-bold text-center mb-8">File Processor</h1>
-      
+      <h1 className="text-3xl font-bold text-center mb-8">Reed Solomon Error Correction Codes Demo</h1>
+
       <div className="grid md:grid-cols-2 gap-8">
         {/* Encode Section */}
         <div className="space-y-4">
@@ -120,6 +127,7 @@ const FileProcessor = () => {
                 name="file"
                 id="encode-file"
                 className="hidden"
+                onChange={handleFileSelectionEncode} 
               />
               <label
                 htmlFor="encode-file"
@@ -129,6 +137,40 @@ const FileProcessor = () => {
                 <span>Select file to encode</span>
               </label>
             </div>
+            {/* Section tu put in number of required shares and redundant shares (numbers) */}
+            <div className="flex flex-col gap-2">
+              <label htmlFor="required-shares" className="text-sm font-semibold">
+                Number of required shares
+              </label>
+              <input
+                type="number"
+                name="required-shares"
+                id="required-shares"
+                className="border border-gray-300 rounded-lg p-2"
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label htmlFor="redundant-shares" className="text-sm font-semibold">
+                Number of redundant shares
+              </label>
+              <input
+                type="number"
+                name="redundant-shares"
+                id="redundant-shares"
+                className="border border-gray-300 rounded-lg p-2"
+              />
+            </div>
+
+            {selectedEncodeFiles.length > 0 && (
+              <div className="mt-4">
+                <h3 className="text-sm font-semibold">Selected Files:</h3>
+                <ul className="list-disc list-inside text-sm">
+                  {selectedEncodeFiles.map((file, index) => (
+                    <li key={index}>{file}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
             <button
               type="submit"
               disabled={isLoading}
@@ -154,6 +196,7 @@ const FileProcessor = () => {
                 id="decode-files"
                 multiple
                 className="hidden"
+                onChange={handleFileSelectionDecode} 
               />
               <label
                 htmlFor="decode-files"
@@ -163,6 +206,39 @@ const FileProcessor = () => {
                 <span>Select shares to decode</span>
               </label>
             </div>
+             {/* Section tu put in number of required shares and redundant shares (numbers) */}
+             <div className="flex flex-col gap-2">
+              <label htmlFor="required-shares" className="text-sm font-semibold">
+                Number of required shares
+              </label>
+              <input
+                type="number"
+                name="required-shares"
+                id="required-shares"
+                className="border border-gray-300 rounded-lg p-2"
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label htmlFor="redundant-shares" className="text-sm font-semibold">
+                Number of redundant shares
+              </label>
+              <input
+                type="number"
+                name="redundant-shares"
+                id="redundant-shares"
+                className="border border-gray-300 rounded-lg p-2"
+              />
+            </div>
+            {selectedDecodeFiles.length > 0 && (
+              <div className="mt-4">
+                <h3 className="text-sm font-semibold">Selected Files:</h3>
+                <ul className="list-disc list-inside text-sm">
+                  {selectedDecodeFiles.map((file, index) => (
+                    <li key={index}>{file}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
             <button
               type="submit"
               disabled={isLoading}
