@@ -22,7 +22,8 @@ const FileProcessor = () => {
       setIsLoading(false);
       return;
     }
-
+    formData.append('requiredShares', e.target['required-shares'].value);
+    formData.append('redundantShares', e.target['redundant-shares'].value);
     formData.append('file', file);
 
     try {
@@ -54,6 +55,8 @@ const FileProcessor = () => {
     setDecodeStatus('');
 
     const formData = new FormData();
+    formData.append('requiredShares', e.target['required-shares'].value);
+    formData.append('redundantShares', e.target['redundant-shares'].value);
     const files = e.target.files.files;
 
     if (files.length === 0) {

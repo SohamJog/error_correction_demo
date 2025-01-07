@@ -44,9 +44,32 @@ async fn main() {
 // Handler for encoding files
 async fn encode_file(mut multipart: Multipart) -> impl IntoResponse {
     println!("Encoding file");
-    let required = 4;
-    let total = 8;
+    let required_shares = multipart
+        .next_field()
+        .await
+        .unwrap()
+        .unwrap()
+        .text()
+        .await
+        .unwrap()
+        .parse::<usize>()
+        .unwrap();
+
+    let redundant_shares = multipart
+        .next_field()
+        .await
+        .unwrap()
+        .unwrap()
+        .text()
+        .await
+        .unwrap()
+        .parse::<usize>()
+        .unwrap();
+    let required = required_shares as usize;
+    let total = required + redundant_shares as usize;
     let fec = FEC::new(required, total).unwrap();
+
+    println!("Required: {}, Total: {}", required, total);
 
     println!("Reading file data");
 
@@ -100,17 +123,63 @@ async fn encode_file(mut multipart: Multipart) -> impl IntoResponse {
 
 // Handler for decoding files
 async fn decode_files(mut multipart: Multipart) -> impl IntoResponse {
-    let required = 4;
-    let total = 8;
+    let required_shares = multipart
+        .next_field()
+        .await
+        .unwrap()
+        .unwrap()
+        .text()
+        .await
+        .unwrap()
+        .parse::<usize>()
+        .unwrap();
+
+    let redundant_shares = multipart
+        .next_field()
+        .await
+        .unwrap()
+        .unwrap()
+        .text()
+        .await
+        .unwrap()
+        .parse::<usize>()
+        .unwrap();
+    let required = required_shares as usize;
+    let total = required + redundant_shares as usize;
+
+    println!("Decoding file");
+    println!("Required: {}, Total: {}", required, total);
+
     let fec = FEC::new(required, total).unwrap();
 
     let mut shares = vec![];
 
     // Read uploaded share files from multipart
     while let Some(field) = multipart.next_field().await.unwrap() {
+        let filename = field.file_name().unwrap_or_default().to_string();
+
         let share_data = field.bytes().await.unwrap().to_vec();
+
+        let number = match filename
+            .split('_')
+            .last()
+            .unwrap()
+            .split('.')
+            .next()
+            .unwrap()
+            .parse::<usize>()
+        {
+            Ok(num) => num,
+            Err(_) => {
+                return (
+                    axum::http::StatusCode::BAD_REQUEST,
+                    [("Content-Type", "text/plain")],
+                    b"Invalid filename format".to_vec(),
+                );
+            }
+        };
         shares.push(Share {
-            number: shares.len(),
+            number,
             data: share_data,
         });
     }
