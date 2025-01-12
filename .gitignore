@@ -2,3 +2,5 @@
 /output
 /shares
 /backend/target
+backend/reed_solomon_demo_key.pub
+backend/reed_solomon_demo_key
