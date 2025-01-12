@@ -15,7 +15,6 @@ const FileProcessor = () => {
     setIsLoading(true);
     setEncodeStatus('');
     //server name
-    console.log(API_URL);
 
     const formData = new FormData();
     const file = e.target.file.files[0];
