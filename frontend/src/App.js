@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Upload, FileUp, FileDown } from 'lucide-react';
+const API_URL = process.env.REACT_APP_SERVER_URL;
 
 const FileProcessor = () => {
   const [encodeStatus, setEncodeStatus] = useState('');
@@ -13,6 +14,8 @@ const FileProcessor = () => {
     e.preventDefault();
     setIsLoading(true);
     setEncodeStatus('');
+    //server name
+    console.log(API_URL);
 
     const formData = new FormData();
     const file = e.target.file.files[0];
@@ -27,7 +30,7 @@ const FileProcessor = () => {
     formData.append('file', file);
 
     try {
-      const response = await fetch('http://localhost:8000/encode', {
+      const response = await fetch(`${API_URL}/encode`, {
         method: 'POST',
         body: formData,
       });
@@ -70,7 +73,7 @@ const FileProcessor = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:8000/decode', {
+      const response = await fetch(`${API_URL}/encode`, {
         method: 'POST',
         body: formData,
       });
